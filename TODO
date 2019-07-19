@@ -1,3 +1,12 @@
+# short list
+Implement the /transfer API which transfers X amount of money from account A to account B.
+
+- The request should be a `POST` request to the method **/transfer** with the payload: `{from:account, to:account, amount:money}`.
+- The response should return the following payload: `{id:transaction_id, from:{id:account, balance:current_balance},to:{id:account,balance:current_balance}, transfered:transfer_amount}`
+
+
+
+
 # Transactions at the bank
 
 ## Context 

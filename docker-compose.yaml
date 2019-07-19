@@ -9,6 +9,8 @@ services:
      - env_file
     networks:
       - db_network
+  web:
+     image: "node"
 networks:
   db_network:
     driver: bridge

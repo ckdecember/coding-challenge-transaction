@@ -1,0 +1,21 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+#FormLayout  {
+  font-family: Verdana;
+  font-size: 10pt;
+  margin-top: 10px;
+  background-color: #f3f3f3;
+  border: solid 1px #a1a1a1;
+  padding: 10px;
+}
+
+#FormLayout label {
+  text-align: right;
+}

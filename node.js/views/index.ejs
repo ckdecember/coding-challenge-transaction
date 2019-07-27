@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%= title %></title>
+        <link rel='stylesheet' href='/stylesheets/style.css' />
+        <script src="/javascripts/basic.js"></script>
+    </head>
+    <body>
+        <h1><%= title %></h1>
+            <p>Welcome to <%= title %></p>
+        <h2>The MO MONEY Page</h2>
+
+        <form method="post" action="/transfer">
+            <ul>
+                <li><input type="text" name="fromaccount" /></li>
+                <li><input type="text" name="toaccount" /></li>
+                <li><input type="text" name="amountmoney" /></li>
+            </ul>
+            <input type="submit" value="Submit" />
+        </form>
+        
+    </body>
+</html>

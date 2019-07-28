@@ -1,2 +1,0 @@
-install npm express
-install connect-pg-simple

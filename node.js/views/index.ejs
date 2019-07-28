@@ -1,23 +1,19 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title><%= title %></title>
-        <link rel='stylesheet' href='/stylesheets/style.css' />
-        <script src="/javascripts/basic.js"></script>
-    </head>
-    <body>
-        <h1><%= title %></h1>
-            <p>Welcome to <%= title %></p>
-        <h2>The MO MONEY Page</h2>
-
-        <form method="post" action="/transfer">
-            <ul>
-                <li><input type="text" name="fromaccount" /></li>
-                <li><input type="text" name="toaccount" /></li>
-                <li><input type="text" name="amountmoney" /></li>
-            </ul>
-            <input type="submit" value="Submit" />
-        </form>
-        
-    </body>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <p>Welcome to <%= title %></p>
+    <form method="post" action="/transfer">
+      <div id="FormLayout">
+        <label>From:</label><input type="text" name="fromaccount" /><br/>
+        <label>To:</label><input type="text" name="toaccount" /><br/>
+        <label>Amount:</label><input type="text" name="amountmoney" /><br/>
+        <button>Submit</button>
+      </div>
+  </form>
+  </body>
 </html>

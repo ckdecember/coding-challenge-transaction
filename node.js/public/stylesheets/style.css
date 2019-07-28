@@ -14,8 +14,19 @@ a {
   background-color: #f3f3f3;
   border: solid 1px #a1a1a1;
   padding: 10px;
+  width: 550px;
 }
 
 #FormLayout label {
-  text-align: right;
+  text-align: left;
+}
+
+#FormLayout input {
+  width: 200px;
+}
+
+#FormLayout label, #FormLayout input {
+  display: block;
+  /*float: left;*/
+  margin-bottom: 20px;
 }

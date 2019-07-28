@@ -2,3 +2,4 @@ env_file
 node.js/node_modules/
 node.js/npm-debug.log
 node.js.old
+node.js/.env

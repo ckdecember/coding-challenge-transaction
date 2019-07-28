@@ -30,3 +30,12 @@ a {
   /*float: left;*/
   margin-bottom: 20px;
 }
+
+.form_button {
+  color: #f3f3f3;
+  background: #0073ad;
+  border: 2px outset #0073ad;
+  /*float: right; */
+  cursor: pointer;
+  height: 28px;
+}

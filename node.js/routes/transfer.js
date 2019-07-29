@@ -17,6 +17,7 @@ router.post('/', async (req, res, next) => {
     var fromaccount = req.body.fromaccount;
     var toaccount = req.body.toaccount;
     var amountmoney = req.body.amountmoney;
+    var sessionguard = req.body.sessionguard;
 
     try {
         client = await pool.connect()
@@ -26,11 +27,31 @@ router.post('/', async (req, res, next) => {
     }
 
     try {
+        rows = await client.query('SELECT EXISTS(SELECT 1 from sessionguard WHERE session_number = $1::int)', [sessionguard])
+    } catch (error) {
+        return error;
+    } 
+
+    console.log("WHY");
+    if (rows) {
+        res.render('transfer', {
+            'title' : "MO MONEY TRANSFERRED - DUPE FOUND",
+            'fromaccount' : fromaccount,
+            'sessionguard' : sessionguard
+        })
+        return;
+    }
+
+
+    try {
         await client.query('BEGIN');
         await client.query('INSERT INTO transactions (id, amount, accountnumber) VALUES (DEFAULT, $1::int, $2::int)', 
             [-amountmoney, fromaccount]);
         await client.query('INSERT INTO transactions (id, amount, accountnumber) VALUES (DEFAULT, $1::int, $2::int)',
             [amountmoney, toaccount]);
+        await client.query('INSERT INTO sessionguard (session_number, create_time) VALUES ($1::int, now())',
+            [sessionguard]);
+        
         await client.query('COMMIT');
     } catch (error) {
         try {
@@ -44,9 +65,12 @@ router.post('/', async (req, res, next) => {
         client.release();
     }
 
+    // set a value on the form somehow?
+
     res.render('transfer', {
         'title' : "MO MONEY TRANSFERRED",
-        'fromaccount' : fromaccount
+        'fromaccount' : fromaccount,
+        'sessionguard' : sessionguard
     })
  
 })

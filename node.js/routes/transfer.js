@@ -11,24 +11,6 @@ const pool = new pg.Pool({
     connectionString:  process.env.DATABASE_URL
 })
 
-async function query (q) {
-    const client = await pool.connect()
-    let res
-    try {
-      await client.query('BEGIN')
-      try {
-        res = await client.query(q)
-        await client.query('COMMIT')
-      } catch (err) {
-        await client.query('ROLLBACK')
-        throw err
-      }
-    } finally {
-      client.release()
-    }
-    return res
-}
-
 /* need to add for POST */
 
 router.post('/', async (req, res, next) => {
@@ -37,10 +19,34 @@ router.post('/', async (req, res, next) => {
     var amountmoney = req.body.amountmoney;
 
     try {
-        const { rows } = await query('SELECT * FROM transactions')
-        console.log(JSON.stringify(rows))
-    } catch (err) {
-        console.log('Database ' + err)
+        client = await pool.connect()
+    } catch (error) {
+        console.log('A client pool error occurred:', error);
+        return error;
+    }
+
+    //db.query('INSERT INTO transactions (id, amount, accountnumber) \
+    //VALUES (DEFAULT, $1::int, $2::text', -amountmoney, fromaccount)
+
+    /*    const { rows } = await query('INSERT INTO transactions (id, amount, accountnumber) VALUES (DEFAULT, $1::int, $2::int)', 
+            [-amountmoney, fromaccount])
+ */   
+    try {
+        await client.query('BEGIN');
+        await client.query('INSERT INTO transactions (id, amount, accountnumber) VALUES (DEFAULT, $1::int, $2::int)', 
+            [-amountmoney, fromaccount]);
+        //await client.query('UPDATE bar SET foo = 2');
+        await client.query('COMMIT');
+    } catch (error) {
+        try {
+            await client.query('ROLLBACK');
+        } catch (rollbackError) {
+            console.log('A rollback error occurred:', rollbackError);
+        }
+        console.log('An error occurred:', error);
+        return error;
+    } finally {
+        client.release();
     }
 
     res.render('transfer', {

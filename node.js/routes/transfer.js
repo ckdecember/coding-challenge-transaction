@@ -32,20 +32,15 @@ router.post('/', function(req, res, next) {
     The response should return the following payload: {id:transaction_id, from:{id:account, balance:current_balance},to:{id:account,balance:current_balance}, transfered:transfer_amount}
     */
 
-    const { Pool } = require('pg')
-    const pool = new Pool()(async () => {
-        const client = await pool.connect()
-        try {
-            await client.query('BEGIN')
-            await client.query('COMMIT')
-        } catch (e) {
-            await client.query('ROLLBACK')
-        } finally {
-            client.release()
-        }
-    })().catch(e => console.error(e.stack))
+    pg = require('pg')
+    Transaction = require('pg-transaction')
 
+    var client = new pg.Client(process.env.DATABASE_URL)
+    client.connect()
+    var tx = new Transaction(client)
+    client.end()
 
+    
     /*
     var transfer_response = {}
     transfer_response['id'] = transaction_id
@@ -86,12 +81,6 @@ router.post('/', function(req, res, next) {
         }
     ))
     .catch((err) => console.error('error executing query', err.stack))
-
-    const evols = await db.query('SELECT DISTINCT evolution \
-    FROM units \
-    WHERE unitname = $1::text', [req.params.unitname])
-        .then( (result) => {return result} )
-        .catch( (err) => console.error('error executing query', err.stack))
     */
 
     res.render('transfer', { 

@@ -13,25 +13,25 @@ const pool = new pg.Pool({
 
 /* need to add for POST */
 
-router.post('/', async (req, res, next) => {
+//router.post('/', async (req, res, next) => {
+router.post('/', function (req, res, next) {
     var fromaccount = req.body.fromaccount;
     var toaccount = req.body.toaccount;
     var amountmoney = req.body.amountmoney;
     var sessionguard = req.body.sessionguard;
 
-    try {
-        client = await pool.connect()
-    } catch (error) {
-        console.log('A client pool error occurred:', error);
-        return error;
-    }
-
+    /*
     try {
         rows = await client.query('SELECT EXISTS(SELECT 1 from sessionguard WHERE session_number = $1::int)', [sessionguard])
     } catch (error) {
         return error;
     } 
+    */
 
+    //await client.query('INSERT INTO sessionguard (session_number, create_time) VALUES ($1::int, now())',
+    //[sessionguard]);
+
+    /*
     console.log("WHY");
     if (rows) {
         res.render('transfer', {
@@ -40,30 +40,37 @@ router.post('/', async (req, res, next) => {
             'sessionguard' : sessionguard
         })
         return;
-    }
+    }*/
 
-
-    try {
-        await client.query('BEGIN');
-        await client.query('INSERT INTO transactions (id, amount, accountnumber) VALUES (DEFAULT, $1::int, $2::int)', 
-            [-amountmoney, fromaccount]);
-        await client.query('INSERT INTO transactions (id, amount, accountnumber) VALUES (DEFAULT, $1::int, $2::int)',
-            [amountmoney, toaccount]);
-        await client.query('INSERT INTO sessionguard (session_number, create_time) VALUES ($1::int, now())',
-            [sessionguard]);
-        
-        await client.query('COMMIT');
-    } catch (error) {
+    async function transaction() {
         try {
-            await client.query('ROLLBACK');
-        } catch (rollbackError) {
-            console.log('A rollback error occurred:', rollbackError);
+            client = await pool.connect()
+        } catch (error) {
+            console.log('A client pool error occurred:', error);
+            return error;
         }
-        console.log('An error occurred:', error);
-        return error;
-    } finally {
-        client.release();
+
+        try {
+            await client.query('BEGIN');
+            await client.query('INSERT INTO transactions (id, amount, accountnumber) VALUES (DEFAULT, $1::int, $2::int)', 
+                [-amountmoney, fromaccount]);
+            await client.query('INSERT INTO transactions (id, amount, accountnumber) VALUES (DEFAULT, $1::int, $2::int)',
+                [amountmoney, toaccount]);
+            await client.query('COMMIT');
+        } catch (error) {
+            try {
+                await client.query('ROLLBACK');
+            } catch (rollbackError) {
+                console.log('A rollback error occurred:', rollbackError);
+            }
+            console.log('An error occurred:', error);
+            return error;
+        } finally {
+            client.release();
+        }
     }
+
+    transaction();
 
     // set a value on the form somehow?
 

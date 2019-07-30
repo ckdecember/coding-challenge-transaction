@@ -41,11 +41,6 @@ router.post('/', async (req, res, next) => {
     
     if (await rows.rows[0]['exists'] == true) {
         res.send("Duped but transaction is OK")
-        /*res.render('transfer', {
-            'title' : "MO MONEY TRANSFERRED",
-            'fromaccount' : fromaccount,
-            'sessionguard' : sessionguard
-        })*/    
     }  else  {
 
         try {
@@ -91,8 +86,6 @@ router.post('/', async (req, res, next) => {
             return error;
         }
 
-        // retro fit to return just a payload.  json it
-        // transaction id, 
         fromaccount_tid.rows[0]['id']
         toaccount_tid.rows[0]['id']
 
@@ -104,14 +97,7 @@ router.post('/', async (req, res, next) => {
         payload["transfer_amount"] = amountmoney
  
         res.send(JSON.stringify(payload))
-        /*
-        res.render('transfer', {
-            'title' : "MO MONEY TRANSFERRED",
-            'fromaccount' : fromaccount,
-            'sessionguard' : sessionguard
-        })*/
     }
 })
-//The response should return the following payload: {id:transaction_id, from:{id:account, balance:current_balance},to:{id:account,balance:current_balance}, transfered:transfer_amount}
 
 module.exports = router

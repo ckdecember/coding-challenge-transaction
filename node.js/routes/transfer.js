@@ -20,16 +20,31 @@ router.post('/', function (req, res, next) {
     var amountmoney = req.body.amountmoney;
     var sessionguard = req.body.sessionguard;
 
-    /*
-    try {
-        rows = await client.query('SELECT EXISTS(SELECT 1 from sessionguard WHERE session_number = $1::int)', [sessionguard])
-    } catch (error) {
-        return error;
-    } 
-    */
 
-    //await client.query('INSERT INTO sessionguard (session_number, create_time) VALUES ($1::int, now())',
-    //[sessionguard]);
+    async function sessioncheck() {
+        try {
+            client = await pool.connect()
+        } catch (error) {
+            console.log('A client pool error occurred:', error);
+            return error;
+        }
+
+        try {
+            rows = await client.query('SELECT EXISTS(SELECT 1 from sessionguard WHERE session_number = $1::int)', [sessionguard])
+        } catch (error) {
+            return error;
+        }
+        
+        try {
+            await client.query('INSERT INTO sessionguard (session_number, create_time) VALUES ($1::int, now())',
+                [sessionguard]);
+        } catch (error) {
+            console.log('An error occurred:', error);
+            return error;
+        }
+    }
+
+    sessioncheck();
 
     /*
     console.log("WHY");

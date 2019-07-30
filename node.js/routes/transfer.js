@@ -20,6 +20,8 @@ router.post('/', async (req, res, next) => {
     var sessionguard = req.body.sessionguard;
     var toaccount_tid;
     var fromaccount_tid;
+    var sumfromaccount;
+    var sumtoaccount;
     var payload = {};
 
     try {
@@ -73,6 +75,22 @@ router.post('/', async (req, res, next) => {
 
         // calculate balance.
 
+        try {
+            sumfromaccount = await client.query('SELECT SUM(amount) FROM transactions WHERE accountnumber = $1::int',
+                [fromaccount]);
+        } catch (error) {
+            console.log('An error occurred:', error);
+            return error;
+        }
+
+        try {
+            sumtoaccount = await client.query('SELECT SUM(amount) FROM transactions WHERE accountnumber = $1::int',
+                [toaccount]);
+        } catch (error) {
+            console.log('An error occurred:', error);
+            return error;
+        }
+
         // retro fit to return just a payload.  json it
         // transaction id, 
         fromaccount_tid.rows[0]['id']
@@ -80,9 +98,9 @@ router.post('/', async (req, res, next) => {
 
         payload["id"] = fromaccount_tid.rows[0]['id']
         payload["f_account"] = fromaccount
-        payload["f_balance"] = "not yet"
+        payload["f_balance"] = sumfromaccount.rows[0]['sum']
         payload["t_account"] = toaccount
-        payload["t_balance"] = "not yet"
+        payload["t_balance"] = sumtoaccount.rows[0]['sum']
         payload["transfer_amount"] = amountmoney
  
         res.send(JSON.stringify(payload))

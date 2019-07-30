@@ -18,6 +18,8 @@ router.post('/', async (req, res, next) => {
     var toaccount = req.body.toaccount;
     var amountmoney = req.body.amountmoney;
     var sessionguard = req.body.sessionguard;
+    var toaccount_tid;
+    var fromaccount_tid;
 
     try {
         client = await pool.connect()
@@ -45,10 +47,10 @@ router.post('/', async (req, res, next) => {
 
         try {
             await client.query('BEGIN');
-            await client.query('INSERT INTO transactions (id, amount, accountnumber) VALUES (DEFAULT, $1::int, $2::int)', 
-                [-amountmoney, fromaccount]);
-            await client.query('INSERT INTO transactions (id, amount, accountnumber) VALUES (DEFAULT, $1::int, $2::int)',
-                [amountmoney, toaccount]);
+            fromaccount_tid = await client.query('INSERT INTO transactions (id, amount, accountnumber) \
+                VALUES (DEFAULT, $1::int, $2::int) RETURNING id', [-amountmoney, fromaccount]);
+            toaccount_tid = await client.query('INSERT INTO transactions (id, amount, accountnumber) \
+                VALUES (DEFAULT, $1::int, $2::int) RETURNING id', [amountmoney, toaccount]);
             await client.query('COMMIT');
         } catch (error) {
             try {
@@ -69,7 +71,9 @@ router.post('/', async (req, res, next) => {
         }
 
         // retro fit to return just a payload.  json it
-        
+        // transaction id, 
+        console.log(fromaccount_tid.rows[0]['id']);
+        console.log(toaccount_tid.rows[0]['id']);
 
         res.render('transfer', {
             'title' : "MO MONEY TRANSFERRED",

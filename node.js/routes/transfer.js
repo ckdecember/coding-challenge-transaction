@@ -34,7 +34,21 @@ router.post('/', function (req, res, next) {
         } catch (error) {
             return error;
         }
-        
+
+        // work with ROWS.
+        if (rows != true) {
+            return rows;
+        }
+    }
+
+    async function updatesessionguard() {
+        try {
+            client = await pool.connect()
+        } catch (error) {
+            console.log('A client pool error occurred:', error);
+            return error;
+        }
+
         try {
             await client.query('INSERT INTO sessionguard (session_number, create_time) VALUES ($1::int, now())',
                 [sessionguard]);
@@ -44,7 +58,23 @@ router.post('/', function (req, res, next) {
         }
     }
 
-    sessioncheck();
+    sessionguardvar = false;
+    rows = sessioncheck();
+    rows.then(function(result) {
+        console.log(result);
+        console.log(result.rows[0]['exists']);
+        if (rows == true)  {
+            sessionguardvar = true;
+        }
+    })
+
+    if (sessionguardvar == true)  {
+        updatesessionguard().then(function(results) {
+            console.log(results)
+        })
+    }
+
+    // right.  need to someone pass a value back out.
 
     /*
     console.log("WHY");

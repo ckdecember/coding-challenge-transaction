@@ -20,6 +20,7 @@ router.post('/', async (req, res, next) => {
     var sessionguard = req.body.sessionguard;
     var toaccount_tid;
     var fromaccount_tid;
+    var payload = {};
 
     try {
         client = await pool.connect()
@@ -37,12 +38,12 @@ router.post('/', async (req, res, next) => {
     console.log(rows)
     
     if (await rows.rows[0]['exists'] == true) {
-        // just show the page witout doing the transaction
-        res.render('transfer', {
+        res.send("Duped but transaction is OK")
+        /*res.render('transfer', {
             'title' : "MO MONEY TRANSFERRED",
             'fromaccount' : fromaccount,
             'sessionguard' : sessionguard
-        })    
+        })*/    
     }  else  {
 
         try {
@@ -70,16 +71,27 @@ router.post('/', async (req, res, next) => {
             return error;
         }
 
+        // calculate balance.
+
         // retro fit to return just a payload.  json it
         // transaction id, 
-        console.log(fromaccount_tid.rows[0]['id']);
-        console.log(toaccount_tid.rows[0]['id']);
+        fromaccount_tid.rows[0]['id']
+        toaccount_tid.rows[0]['id']
 
+        payload["id"] = fromaccount_tid.rows[0]['id']
+        payload["f_account"] = fromaccount
+        payload["f_balance"] = "not yet"
+        payload["t_account"] = toaccount
+        payload["t_balance"] = "not yet"
+        payload["transfer_amount"] = amountmoney
+ 
+        res.send(JSON.stringify(payload))
+        /*
         res.render('transfer', {
             'title' : "MO MONEY TRANSFERRED",
             'fromaccount' : fromaccount,
             'sessionguard' : sessionguard
-        })
+        })*/
     }
 })
 //The response should return the following payload: {id:transaction_id, from:{id:account, balance:current_balance},to:{id:account,balance:current_balance}, transfered:transfer_amount}
